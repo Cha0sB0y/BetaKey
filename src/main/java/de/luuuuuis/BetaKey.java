@@ -1,5 +1,9 @@
 package de.luuuuuis;
 
+import de.luuuuuis.SQL.KeyInfo;
+import de.luuuuuis.SQL.MySQL;
+import de.luuuuuis.commands.BetaKeyCommand;
+import de.luuuuuis.listener.JoinListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -15,24 +19,15 @@ import java.util.*;
 
 public class BetaKey extends Plugin {
 
-    static BetaKey instance;
+    private static BetaKey instance;
 
-    public static String FilePath;
+    String FilePath;
     public static String prefix;
-    public static String betakeyPerm;
-    public static String rootAccount;
-
     public static String kickReason;
 
-    static String host;
-    static String port;
-    static String database;
-    static String user;
-    static String password;
+    String host, port, database, user, password;
 
-    public static ArrayList<String> allUUID = new ArrayList<>();
-
-    //MySQL MySQL;
+    MySQL MySQL;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
@@ -129,7 +124,7 @@ public class BetaKey extends Plugin {
                 }
 
                 byte[] buffer = new byte[4096];
-                int n = 0;
+                int n;
                 while (-1 != (n = input.read(buffer))) {
                     output.write(buffer, 0, n);
                 }
@@ -157,10 +152,10 @@ public class BetaKey extends Plugin {
             Map mysqlJSON = (Map) JObj.get("MySQL");
 
             Iterator<Map.Entry> itr3 = mysqlJSON.entrySet().iterator();
-            while (itr3.hasNext()) {
+            itr3.forEachRemaining(all -> {
                 Map.Entry pair = itr3.next();
                 MySQLCredentials.put(pair.getKey().toString(), pair.getValue());
-            }
+            });
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -172,42 +167,19 @@ public class BetaKey extends Plugin {
         user = MySQLCredentials.get("User").toString();
         password = MySQLCredentials.get("Password").toString();
 
-//        MySQL = new MySQL();
-//        MySQL.connect(host, port, database, user, password);
+        MySQL = new MySQL();
+        MySQL.connect(host, port, database, user, password);
+        new KeyInfo().updateList();
 
         getProxy().registerChannel("BungeeCord");
 
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
 
-//        pm.registerListener(this, new JoinListener());
-//        pm.registerCommand(this, new BetaKeyCommand("betakey"));
+        pm.registerListener(this, new JoinListener());
+        pm.registerCommand(this, new BetaKeyCommand("betakey"));
 
-//        updateList();
 //        new httpHandler();
     }
-
-//    private void updateList() {
-//        ProxyServer.getInstance().getScheduler().schedule(instance, new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                ResultSet rs = MySQL.getResult("SELECT * FROM allowedPlayers");
-//                try {
-//                    while (rs.next()) {
-//                        try {
-//                            allUUID.add(rs.getString("UUID"));
-//                        } catch (SQLException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        }, 0, 3, TimeUnit.MINUTES);
-//    }
-
     /**
      * by https://stackoverflow.com/a/13678355/10011954
      *
@@ -230,4 +202,7 @@ public class BetaKey extends Plugin {
         return randomStr.substring(0, length);
     }
 
+    public static BetaKey getInstance() {
+        return instance;
+    }
 }
