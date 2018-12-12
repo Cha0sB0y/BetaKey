@@ -1,0 +1,7 @@
+name: BetaKey
+version: b5
+main: de.luuuuuis.BetaKey
+author: Luuuuuis
+
+commands:
+  betakey:
