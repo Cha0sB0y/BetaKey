@@ -69,7 +69,7 @@ public class BetaKey extends Plugin {
             if (!(I[0].equalsIgnoreCase(getDescription().getVersion()))) {
 
                 System.out.println("BetaKey >> New build (" + I[0] + ") found!");
-                System.out.println("BetaKey >> Download: https://www.spigotmc.org/resources/.58818/");
+                System.out.println("BetaKey >> Download: https://www.spigotmc.org/resources/58818/");
 
                 Thread th = new Thread(() -> {
 
