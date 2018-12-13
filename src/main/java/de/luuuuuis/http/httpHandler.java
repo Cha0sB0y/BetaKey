@@ -28,8 +28,7 @@ public class httpHandler {
 				}
 			}
 		});
-//		server.createContext("/betakey", new BetaKeyContextHandler());
-//		server.createContext("/verify", new VerifyContextHandler());
+		server.createContext("/verify", new VerifyContextHandler());
 		
 		server.setExecutor(null);
 		

@@ -49,7 +49,7 @@ public class BetaKey extends Plugin {
                 + "                                                                           ");
 
         System.out.println("BetaKey >> Enabling BetaKey (" + getDescription().getVersion() + ")");
-        System.out.println("Banns >> Discord for Support: https://discord.gg/2aSSGcz");
+        System.out.println("BetaKey >> Discord for Support: https://discord.gg/2aSSGcz");
 
         URL url;
         HttpURLConnection con = null;
