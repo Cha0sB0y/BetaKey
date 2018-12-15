@@ -2,8 +2,10 @@ package de.luuuuuis;
 
 import de.luuuuuis.SQL.KeyInfo;
 import de.luuuuuis.SQL.MySQL;
-import de.luuuuuis.commands.BetaKeyCommand;
+import de.luuuuuis.commands.BetaKeyCmd;
+import de.luuuuuis.http.HttpHandler;
 import de.luuuuuis.listener.JoinListener;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -22,12 +24,12 @@ public class BetaKey extends Plugin {
     private static BetaKey instance;
 
     String FilePath;
-    public static String prefix;
-    public static String kickReason;
+    static String prefix, kickReason;
 
     String host, port, database, user, password;
 
     MySQL MySQL;
+    HttpHandler httpHandler;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
@@ -41,7 +43,8 @@ public class BetaKey extends Plugin {
          *
          */
 
-        System.out.println(" ______     ______     ______   ______     __  __     ______     __  __    \r\n"
+        System.out.println("\r\n"
+                + " ______     ______     ______   ______     __  __     ______     __  __    \r\n"
                 + "/\\  == \\   /\\  ___\\   /\\__  _\\ /\\  __ \\   /\\ \\/ /    /\\  ___\\   /\\ \\_\\ \\   \r\n"
                 + "\\ \\  __<   \\ \\  __\\   \\/_/\\ \\/ \\ \\  __ \\  \\ \\  _\"-.  \\ \\  __\\   \\ \\____ \\  \r\n"
                 + " \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\_\\ \\_\\  \\ \\_\\ \\_\\  \\ \\_____\\  \\/\\_____\\ \r\n"
@@ -110,18 +113,19 @@ public class BetaKey extends Plugin {
         File file;
 
         file = new File(getDataFolder().getPath(), "config.json");
-        try {
-            dowURL = new URL("http://luis.bplaced.net/BetaKey/Auto-Updater/config.json");
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-        }
 
         if (!file.exists()) {
-            try (InputStream input = dowURL.openStream(); FileOutputStream output = new FileOutputStream(file)) {
-
+            try {
+                dowURL = new URL("http://luis.bplaced.net/BetaKey/Auto-Updater/config.json");
                 if (!getDataFolder().exists()) {
                     getDataFolder().mkdir();
                 }
+                file.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            try (InputStream input = dowURL.openStream();
+                 FileOutputStream output = new FileOutputStream(file)) {
 
                 byte[] buffer = new byte[4096];
                 int n;
@@ -146,16 +150,16 @@ public class BetaKey extends Plugin {
             obj = new JSONParser().parse(new FileReader(getDataFolder().getPath() + "/" + "config.json"));
             JSONObject JObj = (JSONObject) obj;
 
-            prefix = (String) JObj.get("Prefix");
-            kickReason = (String) JObj.get("KickReason");
+            prefix = JObj.get("Prefix").toString().replace("§", "&") + "&7";
+            kickReason = JObj.get("KickReason").toString().replace("§", "&");
 
             Map mysqlJSON = (Map) JObj.get("MySQL");
 
             Iterator<Map.Entry> itr3 = mysqlJSON.entrySet().iterator();
-            itr3.forEachRemaining(all -> {
+            while (itr3.hasNext()) {
                 Map.Entry pair = itr3.next();
                 MySQLCredentials.put(pair.getKey().toString(), pair.getValue());
-            });
+            }
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -169,17 +173,25 @@ public class BetaKey extends Plugin {
 
         MySQL = new MySQL();
         MySQL.connect(host, port, database, user, password);
-        new KeyInfo().updateList();
+        new KeyInfo().getAllowed();
 
         getProxy().registerChannel("BungeeCord");
 
         PluginManager pm = ProxyServer.getInstance().getPluginManager();
 
         pm.registerListener(this, new JoinListener());
-        pm.registerCommand(this, new BetaKeyCommand("betakey"));
+        pm.registerCommand(this, new BetaKeyCmd("betakey"));
 
-//        new httpHandler();
+        httpHandler = new HttpHandler();
     }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        MySQL.close();
+        httpHandler.stop();
+    }
+
     /**
      * by https://stackoverflow.com/a/13678355/10011954
      *
@@ -204,5 +216,15 @@ public class BetaKey extends Plugin {
 
     public static BetaKey getInstance() {
         return instance;
+    }
+
+    public static String getPrefix() {
+        String back = ChatColor.translateAlternateColorCodes('&', prefix);
+        return back;
+    }
+
+    public static String getKickReason() {
+        String back = ChatColor.translateAlternateColorCodes('&', kickReason);
+        return back;
     }
 }

@@ -15,9 +15,9 @@ public class JoinListener implements Listener {
         KeyInfo keyInfo = new KeyInfo();
 
         if (keyInfo.getAllowedList().isEmpty()) {
-            keyInfo.addPlayer(uuid);
+            keyInfo.addPlayer(uuid, e.getConnection().getName());
         } else if (!keyInfo.getAllowedList().contains(uuid)) {
-            e.setCancelReason(BetaKey.kickReason);
+            e.setCancelReason(BetaKey.getKickReason());
             e.setCancelled(true);
         }
 

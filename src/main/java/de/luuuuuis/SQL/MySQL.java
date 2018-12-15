@@ -1,10 +1,6 @@
 package de.luuuuuis.SQL;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class MySQL {
 
@@ -21,10 +17,12 @@ public class MySQL {
                         "jdbc:mysql://" + host + ":" + port
                                 + "/" + database + "?autoReconnect=true&useUnicode=yes",
                         user, password);
-                System.out.println("Banns >> MySQL Connected");
+                System.out.println("BetaKey >> MySQL Connected");
                 createTable();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } catch (SQLException ex) {
+                System.err.println("BetaKey ERROR >> Can not connect to MySQL");
+                ex.printStackTrace();
+                System.err.println("BetaKey ERROR >> Can not connect to MySQL");
             }
         }
     }
@@ -33,7 +31,7 @@ public class MySQL {
         if (isConnected()) {
             try {
                 con.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS betakeys(betakey VARCHAR(36))");
-                con.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS allowedPlayers(UUID VARCHAR(36))");
+                con.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS allowedPlayers(UUID VARCHAR(36), NAME VARCHAR(16))");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -61,8 +59,6 @@ public class MySQL {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        } else {
-            update(qry);
         }
     }
 
@@ -76,9 +72,6 @@ public class MySQL {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-            return rs;
-        } else {
-            getResult(qry);
         }
         return null;
     }

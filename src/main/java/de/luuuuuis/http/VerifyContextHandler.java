@@ -12,94 +12,127 @@ public class VerifyContextHandler extends LuisHandler {
 
     @Override
     public void handle(HttpExchange exchange) {
-        Map<String, String> request = queryToMap(exchange.getRequestURI().toString());
+        Map<String, String> request = queryToMap(exchange.getRequestURI().getQuery());
 
-        String response;
+        try {
+            String response = readSite("verify.html").replace("%servername%", "BetaKey");
 
-        if (request.containsKey("username") && request.containsKey("key")) {
-            String username = request.get("username");
-            String key = request.get("key");
+            if (request.containsKey("username") && request.containsKey("key")) {
+                String username = request.get("username");
+                String key = request.get("key");
 
-            System.out.println("login from " + exchange.getRemoteAddress().getAddress().getHostAddress() + " -> " + username + "/" + key);
+                if(username.length() > 16 || key.length() > 36) {
+                    return;
+                }
 
-            /**
-             * Login
-             */
-            KeyInfo keyInfo = new KeyInfo();
+                /*
+                 * Verify
+                 */
+                KeyInfo keyInfo = new KeyInfo();
 
-            String pUUID = MojangUUIDResolve.getUUIDResult(username).getValue();
-            if (!pUUID.equals("null")) {
-                if (!keyInfo.alreadyAdded(pUUID)) {
-                    if (keyInfo.keyIsValid(key)) {
+                String uuid = MojangUUIDResolve.getUUIDResult(username).getValue();
+                if (!uuid.equals("null")) {
+                    if (!keyInfo.alreadyAdded(uuid)) {
+                        if (keyInfo.keyIsValid(key)) {
+
+                            if (!key.endsWith("t-P") && !(key.getBytes().length > 36))
+                                keyInfo.deleteKey(key);
+
+                            keyInfo.addPlayer(uuid, username);
+
+                            response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                                    "\r\n" +
+                                    "<script type=\"text/javascript\">\r\n" +
+                                    "\r\n" +
+                                    "	$(window).ready(function () {\r\n" +
+                                    "		swal({\r\n" +
+                                    "			  title: \"Welcome, " + username + "!\",\r\n" +
+                                    "             text: \"You can now access our Minecraft server.\", \r\n" +
+                                    "			  icon: \"success\",\r\n" +
+                                    "			});\r\n" +
+                                    "	history.pushState({}, \"/verify\", window.location.pathname);\r\n" +
+                                    "	});\r\n" +
+                                    "\r\n" +
+                                    "</script>");
 
 
-                        if (!key.endsWith("t-P") && !(key.getBytes().length > 36))
-                            keyInfo.deleteKey(key);
+                            response(200, response.getBytes(), exchange);
+                            return;
+                        } else {
+                            response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                                    "\r\n" +
+                                    "<script type=\"text/javascript\">\r\n" +
+                                    "\r\n" +
+                                    "	$(window).ready(function () {\r\n" +
+                                    "		swal({\r\n" +
+                                    "			  title: \"Something went wrong! :(\",\r\n" +
+                                    "             text: \"This key is not valid. Try another!\", \r\n" +
+                                    "			  icon: \"error\",\r\n" +
+                                    "			});\r\n" +
+                                    "	history.pushState({}, \"/verify\", window.location.pathname);\r\n" +
+                                    "	});\r\n" +
+                                    "\r\n" +
+                                    "</script>");
 
 
-                        keyInfo.getAllowedList().add(pUUID);
-                        keyInfo.addPlayer(pUUID);
-
-                        response = "success=all right";
-
-                        exchange.getResponseHeaders().add("Location", "/verify?verified");
-                        exchange.getResponseHeaders().put("Context-Type", Collections.singletonList("text/plain; charset=UTF-8"));
-                        try {
-                            response(302, response.getBytes(), exchange);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
+                            response(200, response.getBytes(), exchange);
+                            return;
                         }
-                        return;
+
+
                     } else {
-                        response = "error=wrong key";
+                        response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                                "\r\n" +
+                                "<script type=\"text/javascript\">\r\n" +
+                                "\r\n" +
+                                "	$(window).ready(function () {\r\n" +
+                                "		swal({\r\n" +
+                                "			  title: \"You are already verified! :(\",\r\n" +
+                                "             text: \"Please enter another username!\", \r\n" +
+                                "			  icon: \"success\",\r\n" +
+                                "			});\r\n" +
+                                "	history.pushState({}, \"/verify\", window.location.pathname);\r\n" +
+                                "	});\r\n" +
+                                "\r\n" +
+                                "</script>");
 
-                        exchange.getResponseHeaders().add("Location", "/verify?wrongkey");
-                        exchange.getResponseHeaders().put("Context-Type", Collections.singletonList("text/plain; charset=UTF-8"));
-                        try {
-                            response(302, response.getBytes(), exchange);
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+
+                        response(200, response.getBytes(), exchange);
                         return;
                     }
-
 
                 } else {
-                    response = "error=already verified";
+                    response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                            "\r\n" +
+                            "<script type=\"text/javascript\">\r\n" +
+                            "\r\n" +
+                            "	$(window).ready(function () {\r\n" +
+                            "		swal({\r\n" +
+                            "			  title: \"Something went wrong! :(\",\r\n" +
+                            "             text: \"Try again!\", \r\n" +
+                            "			  icon: \"error\",\r\n" +
+                            "			});\r\n" +
+                            "	history.pushState({}, \"/verify\", window.location.pathname);\r\n" +
+                            "	});\r\n" +
+                            "\r\n" +
+                            "</script>");
 
-                    exchange.getResponseHeaders().add("Location", "/verify?alreadyverified");
-                    exchange.getResponseHeaders().put("Context-Type", Collections.singletonList("text/plain; charset=UTF-8"));
-                    try {
-                        response(302, response.getBytes(), exchange);
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+
+                    response(200, response.getBytes(), exchange);
                     return;
                 }
 
             } else {
-                response = "error=wrong username";
-                exchange.getResponseHeaders().add("Location", "/verify?wrongusername");
+                response = response.replace("%script%", "");
+
+                exchange.getResponseHeaders().add("Location", "/verify");
                 exchange.getResponseHeaders().put("Context-Type", Collections.singletonList("text/plain; charset=UTF-8"));
-                try {
-                    response(302, response.getBytes(), exchange);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+                response(200, response.getBytes(), exchange);
                 return;
             }
 
-        } else {
-            response = "error=bad request";
-
-            exchange.getResponseHeaders().add("Location", "/verify?badrequest");
-            exchange.getResponseHeaders().put("Context-Type", Collections.singletonList("text/plain; charset=UTF-8"));
-            try {
-                response(302, response.getBytes(), exchange);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            return;
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
 
     }

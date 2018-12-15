@@ -1,18 +1,16 @@
 package de.luuuuuis.SQL;
 
-import de.luuuuuis.BetaKey;
-import net.md_5.bungee.api.ProxyServer;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class KeyInfo {
 
     private MySQL MySQL = new MySQL();
 
     private static ArrayList<String> allowedList = new ArrayList<>();
+    private static ArrayList<String> allowedNameList = new ArrayList<>();
+    private static ArrayList<String> keyList = new ArrayList<>();
 
     public KeyInfo() {
 
@@ -59,14 +57,18 @@ public class KeyInfo {
         MySQL.update("INSERT INTO betakeys (betakey) VALUES ('" + key + "')");
     }
 
-    public void addPlayer(String uuid) {
-        MySQL.update("INSERT INTO allowedPlayers (UUID) VALUES ('" + uuid + "')");
-        allowedList.add(uuid);
+    public void addPlayer(String uuid, String name) {
+        if (!alreadyAdded(uuid)) {
+            MySQL.update("INSERT INTO allowedPlayers (UUID, NAME) VALUES ('" + uuid + "', '" + name + "')");
+            allowedList.add(uuid);
+        }
     }
 
-    public void deletePlayer(String uuid) {
-        MySQL.update("DELETE FROM allowedPlayers WHERE UUID='" + uuid + "'");
-        allowedList.remove(uuid);
+    public void removePlayer(String uuid, String name) {
+        if (alreadyAdded(uuid)) {
+            MySQL.update("DELETE FROM allowedPlayers WHERE NAME='" + name + "'");
+            allowedList.remove(uuid);
+        }
     }
 
     public boolean alreadyAdded(String uuid) {
@@ -82,25 +84,55 @@ public class KeyInfo {
     }
 
 
-    public void updateList() {
-        ProxyServer.getInstance().getScheduler().schedule(BetaKey.getInstance(), () -> {
+    public void getAllowed() {
+        try (ResultSet rs = MySQL.getResult("SELECT * FROM allowedPlayers")) {
+            while (rs.next()) {
+                allowedList.add(rs.getString("UUID"));
+            }
+        } catch (SQLException e) {
+            System.err.print("BetaKey ERROR >> Probably MySQL is not connected");
+            e.printStackTrace();
+            System.err.print("BetaKey ERROR >> Probably MySQL is not connected");
+        }
+    }
 
-                try (ResultSet rs = MySQL.getResult("SELECT * FROM allowedPlayers")) {
-                    while (rs.next()) {
-                        try {
-                            allowedList.add(rs.getString("UUID"));
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+    public void getAllowedName() {
+        try (ResultSet rs = MySQL.getResult("SELECT * FROM allowedPlayers")) {
+            while (rs.next()) {
+                allowedNameList.add(rs.getString("NAME"));
+            }
+        } catch (SQLException e) {
+            System.err.print("BetaKey ERROR >> Probably MySQL is not connected");
+            e.printStackTrace();
+            System.err.print("BetaKey ERROR >> Probably MySQL is not connected");
+        }
+    }
 
-        }, 0, 3, TimeUnit.MINUTES);
+    public void getKeys() {
+        try (ResultSet rs = MySQL.getResult("SELECT * FROM betakeys")) {
+            while (rs.next()) {
+                keyList.add(rs.getString("betakey"));
+            }
+        } catch (SQLException e) {
+            System.err.print("BetaKey ERROR >> Probably MySQL is not connected");
+            e.printStackTrace();
+            System.err.print("BetaKey ERROR >> Probably MySQL is not connected");
+        }
     }
 
     public ArrayList<String> getAllowedList() {
         return allowedList;
+    }
+
+    public ArrayList<String> getKeyList() {
+        keyList.clear();
+        getKeys();
+        return keyList;
+    }
+
+    public ArrayList<String> getAllowedNameList() {
+        allowedNameList.clear();
+        getAllowedName();
+        return allowedNameList;
     }
 }
