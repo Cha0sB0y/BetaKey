@@ -58,7 +58,7 @@ public class BetaKey extends Plugin {
         HttpURLConnection con = null;
 
         try {
-            url = new URL("http://luis.bplaced.net/BetaKey/Auto-Updater/version.html");
+            url = new URL("http://193.34.78.15/SpigotMC/BetaKey/Updater/version.html");
             con = (HttpURLConnection) url.openConnection();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -116,7 +116,7 @@ public class BetaKey extends Plugin {
 
         if (!file.exists()) {
             try {
-                dowURL = new URL("http://luis.bplaced.net/BetaKey/Auto-Updater/config.json");
+                dowURL = new URL("http://193.34.78.15/SpigotMC/BetaKey/config.json");
                 if (!getDataFolder().exists()) {
                     getDataFolder().mkdir();
                 }
@@ -136,7 +136,7 @@ public class BetaKey extends Plugin {
                 input.close();
                 output.close();
 
-                System.out.println("BetaKey >> New config.json downloaded");
+                System.out.println("BetaKey >> config.json downloaded");
 
             } catch (Exception ex) {
                 ex.printStackTrace();
