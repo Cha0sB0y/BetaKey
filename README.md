@@ -10,11 +10,11 @@ At first you create a unique key and send it to a player. This player can now en
 
 
 Commands:
-> "/BetaKey create" creates a random key. By clicking on the Key you copy it.
-> "/BetaKey create PERMA" creates a random permanent key. By clicking on the Key you copy it.
-> "/BetaKey delete <KEY>" deletes a key and you can't use it after that anymore
-> "/BetaKey add <NAME>" add a player without using a key
-> "/BetaKey remove <NAME>" remove a player from the whitelist (even those with code)
+- "/BetaKey create" creates a random key. By clicking on the Key you copy it.
+- "/BetaKey create PERMA" creates a random permanent key. By clicking on the Key you copy it.
+- "/BetaKey delete <KEY>" deletes a key and you can't use it after that anymore
+- "/BetaKey add <NAME>" add a player without using a key
+- "/BetaKey remove <NAME>" remove a player from the whitelist (even those with code)
 
 
 Website:
