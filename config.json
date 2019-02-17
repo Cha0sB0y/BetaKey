@@ -1,0 +1,11 @@
+{
+	"Prefix": "&cBetaKey &8>> &7",
+	"KickReason": "&bBetaKey\n\n&7You have to redeem your key on &cBetaKey.de&7.",
+	"MySQL": {
+		"Host": "localhost",
+		"Port": 3306,
+		"Database": "minecraft",
+		"User": "root",
+		"Password": "yourSweetPassword"
+		}
+}
