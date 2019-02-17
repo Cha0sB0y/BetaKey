@@ -19,21 +19,42 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
 public class BetaKey extends Plugin {
 
-    private static BetaKey instance;
-
-    String FilePath;
     static String prefix, kickReason;
-
+    private static BetaKey instance;
+    String FilePath;
     String host, port, database, user, password;
 
     MySQL MySQL;
     HttpHandler httpHandler;
+
+    /**
+     * by https://stackoverflow.com/a/13678355/10011954
+     *
+     * @param length
+     * @return
+     */
+    public static String getRandomKey(int length) {
+        String randomStr = UUID.randomUUID().toString();
+        while (randomStr.length() < length) {
+            randomStr += UUID.randomUUID().toString();
+        }
+        return randomStr.substring(0, length);
+    }
+
+    public static String getPrefix() {
+        String back = ChatColor.translateAlternateColorCodes('&', prefix);
+        return back;
+    }
+
+    public static String getKickReason() {
+        String back = ChatColor.translateAlternateColorCodes('&', kickReason);
+        return back;
+    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
@@ -127,7 +148,7 @@ public class BetaKey extends Plugin {
             }
             try {
 
-                URL downloadURL = new URL("https://raw.githubusercontent.com/Luuuuuis/InstantVerify/master/config.json");
+                URL downloadURL = new URL("https://raw.githubusercontent.com/Luuuuuis/BetaKey/master/config.json");
 
                 HttpURLConnection urlConnection = (HttpURLConnection) downloadURL.openConnection();
                 urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
@@ -157,9 +178,7 @@ public class BetaKey extends Plugin {
 
             Map mysqlJSON = (Map) JObj.get("MySQL");
 
-            Iterator<Map.Entry> itr3 = mysqlJSON.entrySet().iterator();
-            while (itr3.hasNext()) {
-                Map.Entry pair = itr3.next();
+            for (Map.Entry pair : (Iterable<Map.Entry>) mysqlJSON.entrySet()) {
                 MySQLCredentials.put(pair.getKey().toString(), pair.getValue());
             }
 
@@ -175,7 +194,8 @@ public class BetaKey extends Plugin {
 
         MySQL = new MySQL();
         MySQL.connect(host, port, database, user, password);
-        new KeyInfo().getAllowed();
+        KeyInfo keyInfo = new KeyInfo();
+        keyInfo.getAllowed();
 
         getProxy().registerChannel("BungeeCord");
 
@@ -185,6 +205,13 @@ public class BetaKey extends Plugin {
         pm.registerCommand(this, new BetaKeyCmd("betakey"));
 
         httpHandler = new HttpHandler();
+
+        if (keyInfo.getAllowedList().isEmpty()) {
+            System.out.println("BetaKey >> First Code:");
+            String rndKey = BetaKey.getRandomKey(36);
+            keyInfo.createKey(rndKey);
+            System.out.println("BetaKey >> Key: " + rndKey);
+        }
     }
 
     @Override
@@ -192,41 +219,5 @@ public class BetaKey extends Plugin {
         super.onDisable();
         MySQL.close();
         httpHandler.stop();
-    }
-
-    /**
-     * by https://stackoverflow.com/a/13678355/10011954
-     *
-     * @param length
-     * @return
-     */
-    public static String getRandomKey(int length) {
-        String randomStr = UUID.randomUUID().toString();
-        while (randomStr.length() < length) {
-            randomStr += UUID.randomUUID().toString();
-        }
-        return randomStr.substring(0, length);
-    }
-
-    public static String getRandomPermaKey(int length) {
-        String randomStr = UUID.randomUUID().toString();
-        while (randomStr.length() < length) {
-            randomStr += UUID.randomUUID().toString();
-        }
-        return randomStr.substring(0, length);
-    }
-
-    public static BetaKey getInstance() {
-        return instance;
-    }
-
-    public static String getPrefix() {
-        String back = ChatColor.translateAlternateColorCodes('&', prefix);
-        return back;
-    }
-
-    public static String getKickReason() {
-        String back = ChatColor.translateAlternateColorCodes('&', kickReason);
-        return back;
     }
 }
