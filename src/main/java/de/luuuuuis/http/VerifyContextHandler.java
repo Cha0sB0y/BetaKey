@@ -2,7 +2,7 @@ package de.luuuuuis.http;
 
 import com.sun.net.httpserver.HttpExchange;
 import de.luuuuuis.MojangUUIDResolve;
-import de.luuuuuis.SQL.KeyInfo;
+import de.luuuuuis.MySQL.KeyInfo;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -21,7 +21,7 @@ public class VerifyContextHandler extends LuisHandler {
                 String username = request.get("username");
                 String key = request.get("key");
 
-                if(username.length() > 16 || key.length() > 36) {
+                if (username.length() > 16 || key.length() > 36) {
                     return;
                 }
 
@@ -40,7 +40,7 @@ public class VerifyContextHandler extends LuisHandler {
 
                             keyInfo.addPlayer(uuid, username);
 
-                            response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                            response = response.replace("%script%", "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
                                     "\r\n" +
                                     "<script type=\"text/javascript\">\r\n" +
                                     "\r\n" +
@@ -59,7 +59,7 @@ public class VerifyContextHandler extends LuisHandler {
                             response(200, response.getBytes(), exchange);
                             return;
                         } else {
-                            response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                            response = response.replace("%script%", "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
                                     "\r\n" +
                                     "<script type=\"text/javascript\">\r\n" +
                                     "\r\n" +
@@ -81,7 +81,7 @@ public class VerifyContextHandler extends LuisHandler {
 
 
                     } else {
-                        response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                        response = response.replace("%script%", "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
                                 "\r\n" +
                                 "<script type=\"text/javascript\">\r\n" +
                                 "\r\n" +
@@ -102,7 +102,7 @@ public class VerifyContextHandler extends LuisHandler {
                     }
 
                 } else {
-                    response = response.replace("%script%",  "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
+                    response = response.replace("%script%", "<script src=\"https://unpkg.com/sweetalert/dist/sweetalert.min.js\"></script>\r\n" +
                             "\r\n" +
                             "<script type=\"text/javascript\">\r\n" +
                             "\r\n" +

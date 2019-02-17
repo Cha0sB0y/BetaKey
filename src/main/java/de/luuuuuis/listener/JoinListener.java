@@ -1,7 +1,7 @@
 package de.luuuuuis.listener;
 
 import de.luuuuuis.BetaKey;
-import de.luuuuuis.SQL.KeyInfo;
+import de.luuuuuis.MySQL.KeyInfo;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;

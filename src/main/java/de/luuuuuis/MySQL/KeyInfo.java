@@ -1,4 +1,4 @@
-package de.luuuuuis.SQL.MySQL;
+package de.luuuuuis.MySQL;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +24,7 @@ public class KeyInfo {
      */
 
     public boolean keyIsValid(String key) {
-        try (ResultSet rs = MySQL.getResult("SELECT * FROM betakeys WHERE betakey='" + key + "'");) {
+        try (ResultSet rs = MySQL.getResult("SELECT * FROM betakeys WHERE betakey='" + key + "'")) {
             if (rs.next()) {
                 return rs.getString("betakey") != null;
             }

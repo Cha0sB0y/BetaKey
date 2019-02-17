@@ -2,7 +2,7 @@ package de.luuuuuis.commands;
 
 import de.luuuuuis.BetaKey;
 import de.luuuuuis.MojangUUIDResolve;
-import de.luuuuuis.SQL.KeyInfo;
+import de.luuuuuis.MySQL.KeyInfo;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

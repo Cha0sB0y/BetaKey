@@ -1,7 +1,7 @@
 package de.luuuuuis;
 
-import de.luuuuuis.SQL.KeyInfo;
-import de.luuuuuis.SQL.MySQL;
+import de.luuuuuis.MySQL.KeyInfo;
+import de.luuuuuis.MySQL.MySQL;
 import de.luuuuuis.commands.BetaKeyCmd;
 import de.luuuuuis.http.HttpHandler;
 import de.luuuuuis.listener.JoinListener;
@@ -15,9 +15,13 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class BetaKey extends Plugin {
 
@@ -58,7 +62,7 @@ public class BetaKey extends Plugin {
         HttpURLConnection con = null;
 
         try {
-            url = new URL("http://193.34.78.15/SpigotMC/BetaKey/Updater/version.html");
+            url = new URL("https://raw.githubusercontent.com/Luuuuuis/BetaKey/master/version");
             con = (HttpURLConnection) url.openConnection();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -76,20 +80,19 @@ public class BetaKey extends Plugin {
 
                 Thread th = new Thread(() -> {
 
-                    URL dURL = null;
                     try {
-                        dURL = new URL(I[1]);
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
 
-                    try (InputStream input = dURL.openStream();
-                         FileOutputStream output = new FileOutputStream(getFile())) {
-                        byte[] buffer = new byte[4096];
-                        int n;
-                        while (-1 != (n = input.read(buffer))) {
-                            output.write(buffer, 0, n);
-                        }
+                        URL downloadURL = new URL(I[1]);
+
+                        HttpURLConnection urlConnection = (HttpURLConnection) downloadURL.openConnection();
+                        urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+
+                        InputStream inputStream = urlConnection.getInputStream();
+
+                        Files.copy(inputStream, getFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                        inputStream.close();
+
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -109,14 +112,12 @@ public class BetaKey extends Plugin {
 
         FilePath = getDataFolder().getPath();
 
-        URL dowURL = null;
         File file;
 
         file = new File(getDataFolder().getPath(), "config.json");
 
         if (!file.exists()) {
             try {
-                dowURL = new URL("http://193.34.78.15/SpigotMC/BetaKey/config.json");
                 if (!getDataFolder().exists()) {
                     getDataFolder().mkdir();
                 }
@@ -124,17 +125,18 @@ public class BetaKey extends Plugin {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            try (InputStream input = dowURL.openStream();
-                 FileOutputStream output = new FileOutputStream(file)) {
+            try {
 
-                byte[] buffer = new byte[4096];
-                int n;
-                while (-1 != (n = input.read(buffer))) {
-                    output.write(buffer, 0, n);
-                }
+                URL downloadURL = new URL("https://raw.githubusercontent.com/Luuuuuis/InstantVerify/master/config.json");
 
-                input.close();
-                output.close();
+                HttpURLConnection urlConnection = (HttpURLConnection) downloadURL.openConnection();
+                urlConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+
+                InputStream inputStream = urlConnection.getInputStream();
+
+                Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                inputStream.close();
 
                 System.out.println("BetaKey >> config.json downloaded");
 

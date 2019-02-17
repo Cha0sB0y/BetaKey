@@ -1,4 +1,4 @@
-package de.luuuuuis.SQL.MySQL;
+package de.luuuuuis.MySQL;
 
 import java.sql.*;
 
