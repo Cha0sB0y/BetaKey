@@ -15,6 +15,8 @@ Commands:
 - "/BetaKey delete <KEY>" deletes a key and you can't use it after that anymore
 - "/BetaKey add <NAME>" add a player without using a key
 - "/BetaKey remove <NAME>" remove a player from the whitelist (even those with code)
+  
+Permissions: - BetaKey.key
 
 
 Website:
