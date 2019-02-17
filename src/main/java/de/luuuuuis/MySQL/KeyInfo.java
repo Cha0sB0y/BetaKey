@@ -1,4 +1,4 @@
-package de.luuuuuis.SQL;
+package de.luuuuuis.SQL.MySQL;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
