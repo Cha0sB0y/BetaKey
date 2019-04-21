@@ -221,3 +221,5 @@ public class BetaKey extends Plugin {
         httpHandler.stop();
     }
 }
+
+Haifisch
